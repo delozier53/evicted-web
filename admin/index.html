@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1A2456">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Evicted — Admin</title>
+  <link rel="icon" type="image/png" href="../logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<!-- ============================================================
+     LOGIN SCREEN (shown when not authenticated or not super admin)
+     ============================================================ -->
+<div id="loginWrap" class="login-wrap hidden">
+  <div class="login-card">
+    <img src="../logo.png" alt="" style="width: 72px; height: 72px; margin-bottom: 12px;">
+    <h2>ADMIN</h2>
+    <p class="sub" id="loginSub">Sign in with your admin email.</p>
+
+    <div id="loginEmailStep">
+      <div class="form-field">
+        <label for="loginEmail">Email</label>
+        <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <button class="primary" id="sendCodeBtn" style="width:100%;">Send Code</button>
+    </div>
+
+    <div id="loginCodeStep" class="hidden">
+      <div class="form-field">
+        <label for="loginCode">6-Digit Code</label>
+        <input type="text" id="loginCode" placeholder="123456" inputmode="numeric" maxlength="6" style="letter-spacing:8px; text-align:center; font-family:monospace; font-size:22px;">
+      </div>
+      <button class="primary" id="verifyCodeBtn" style="width:100%;">Verify</button>
+      <button class="secondary" id="backToEmailBtn" style="width:100%; margin-top:8px;">Use a different email</button>
+    </div>
+
+    <div id="loginDenied" class="hidden">
+      <p class="sub" style="color: var(--danger);">This dashboard is for super admins only.</p>
+      <button class="secondary" id="signOutFromDenied" style="width:100%; margin-top:12px;">Sign Out</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     DASHBOARD (shown when authenticated as super admin)
+     ============================================================ -->
+<main id="dashboard" class="hidden">
+  <div class="topbar">
+    <h1>EVICTED · ADMIN</h1>
+    <div class="whoami">
+      <span id="whoami">…</span>
+      <button class="signout" id="signOutBtn">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button data-tab="season" class="active">Season</button>
+    <button data-tab="houseguests">Houseguests</button>
+    <button data-tab="evictions">Evictions</button>
+    <button data-tab="bonuses">Bonuses</button>
+    <button data-tab="finale">Finale</button>
+    <button data-tab="admins">Admins</button>
+  </div>
+
+  <!-- Season section -->
+  <section id="section-season" class="active">
+    <div class="section-head">
+      <h2>SEASON</h2>
+    </div>
+    <div class="card">
+      <h3>Active Season</h3>
+      <p class="muted" id="seasonActiveInfo">Loading…</p>
+    </div>
+    <div class="card">
+      <h3>All Seasons</h3>
+      <div class="list" id="seasonList"></div>
+    </div>
+    <div class="card">
+      <h3>Create New Season</h3>
+      <div class="form-row">
+        <div>
+          <label for="newSeasonName">Name</label>
+          <input type="text" id="newSeasonName" placeholder="Season 29">
+        </div>
+        <div>
+          <label for="newSeasonPremiere">Premiere date (optional)</label>
+          <input type="date" id="newSeasonPremiere">
+        </div>
+      </div>
+      <button class="primary" id="createSeasonBtn">Create Season</button>
+    </div>
+  </section>
+
+  <!-- Houseguests section -->
+  <section id="section-houseguests">
+    <div class="section-head">
+      <h2>HOUSEGUESTS</h2>
+      <button class="primary" id="addHouseguestBtn">+ Add Houseguest</button>
+    </div>
+    <div class="card">
+      <h3>Bulk Import</h3>
+      <p class="muted" style="margin-bottom: 10px;">
+        Paste a JSON array of houseguests. Each item needs at minimum <code>first_name</code> and <code>full_name</code>. Optional: <code>age</code>, <code>hometown</code>, <code>occupation</code>, <code>bio</code>, <code>avatar_url</code>.
+      </p>
+      <textarea id="bulkImportJson" placeholder='[
+  {"first_name": "Alex", "full_name": "Alex Smith", "age": 28, "hometown": "Chicago", "occupation": "Bartender"},
+  {"first_name": "Ben", "full_name": "Ben Jones", "age": 32, "hometown": "Austin", "occupation": "Chef"}
+]'></textarea>
+      <button class="primary" id="bulkImportBtn" style="margin-top: 10px;">Import All</button>
+    </div>
+    <div class="card">
+      <h3>All Houseguests</h3>
+      <div class="list" id="houseguestList"></div>
+    </div>
+  </section>
+
+  <!-- Evictions section -->
+  <section id="section-evictions">
+    <div class="section-head">
+      <h2>EVICTIONS</h2>
+      <button class="primary" id="addEvictionBtn">+ Add Eviction</button>
+    </div>
+    <div class="card">
+      <h3>All Evictions</h3>
+      <div class="list" id="evictionList"></div>
+    </div>
+  </section>
+
+  <!-- Bonuses section -->
+  <section id="section-bonuses">
+    <div class="section-head">
+      <h2>BONUSES</h2>
+      <button class="primary" id="addBonusBtn">+ Add Bonus</button>
+    </div>
+    <div class="card">
+      <h3>All Bonuses</h3>
+      <div class="list" id="bonusList"></div>
+    </div>
+  </section>
+
+  <!-- Finale section -->
+  <section id="section-finale">
+    <div class="section-head">
+      <h2>FINALE RESULTS</h2>
+    </div>
+    <div class="card">
+      <h3>Set / Update Finale</h3>
+      <div class="form-field">
+        <label for="finaleWinner">Winner</label>
+        <select id="finaleWinner"><option value="">— none —</option></select>
+      </div>
+      <div class="form-field">
+        <label for="finaleRunnerUp">Runner-up</label>
+        <select id="finaleRunnerUp"><option value="">— none —</option></select>
+      </div>
+      <div class="form-field">
+        <label for="finaleAfp">AFP (America's Favorite Player)</label>
+        <select id="finaleAfp"><option value="">— none —</option></select>
+      </div>
+      <button class="primary" id="saveFinaleBtn">Save Finale</button>
+    </div>
+  </section>
+
+  <!-- Admins section -->
+  <section id="section-admins">
+    <div class="section-head">
+      <h2>ADMINS</h2>
+    </div>
+    <div class="card">
+      <h3>Current Admins</h3>
+      <div class="list" id="adminList"></div>
+    </div>
+    <div class="card">
+      <h3>Promote a User</h3>
+      <div class="form-row">
+        <div>
+          <label for="promoteUserSelect">User</label>
+          <select id="promoteUserSelect"><option value="">— select —</option></select>
+        </div>
+        <div style="display:flex; align-items:flex-end;">
+          <button class="primary" id="promoteAdminBtn" style="width:100%;">Grant Admin</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ============================================================
+     MODAL (used for houseguest / eviction / bonus editors)
+     ============================================================ -->
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal" id="modal">
+    <h3 id="modalTitle">Edit</h3>
+    <div id="modalBody"></div>
+    <div class="modal-actions">
+      <button class="secondary" id="modalCancelBtn">Cancel</button>
+      <button class="primary" id="modalSaveBtn">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast hidden" id="toast"></div>
+
+<!-- Bootstrap our module -->
+<script type="module" src="admin.js"></script>
+
+</body>
+</html>
